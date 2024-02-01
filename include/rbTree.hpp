@@ -24,7 +24,15 @@ private:
       if (left == nullptr && right == nullptr) {
         return 1;
       }
-      return 1 + left->getLen() + right->getLen();
+      int l_len = 0;
+      int r_len = 0;
+      if (left) {
+        l_len = left->getLen();
+      }
+      if (right) {
+        r_len = right->getLen();
+      }
+      return 1 + l_len + r_len;
     }
 
     int getBlackHeight() {
@@ -32,20 +40,20 @@ private:
       if (left == nullptr && right == nullptr) {
         return color == Color::BLACK ? 1 : 0;
       }
-      int len_l = 0;
-      int len_r = 0;
+      int hei_l = 0;
+      int hei_r = 0;
       if (left != nullptr) {
-        len_l = left->getBlackHeight();
+        hei_l = left->getBlackHeight();
       }
       if (right != nullptr) {
-        len_r = right->getBlackHeight();
+        hei_r = right->getBlackHeight();
       }
 
-      if (len_l == -1 || len_r == -1 || len_l != len_r) {
+      if (hei_l == -1 || hei_r == -1 || hei_l != hei_r) {
         return -1;
       }
 
-      return color == Color::BLACK ? 1 + len_l : len_l;
+      return color == Color::BLACK ? 1 + hei_l : hei_l;
     }
   };
 
@@ -328,7 +336,9 @@ private:
   void deleteNode(Node *nodeToDelete) {
     Node *nodeToReplace = nodeToDelete;
     Node *childOfReplaceNode;
+    Node *parentOfReplaceNode;
     Color originalColor = nodeToReplace->color;
+    Color replaceNodeColor;
 
     if (!nodeToDelete->left) {
       // 要删除的节点没有左子树, 两个子树都为空的情况也包含在内
@@ -342,6 +352,9 @@ private:
       // 2个子树都存在
       // 用要删除节点在中序遍历中的后继来替换当前要删除的元素
       nodeToReplace = findMinimumNode(nodeToDelete->right);
+      replaceNodeColor = nodeToReplace->color;
+      // 因为后面的childOfReplaceNode可能为空, 所有记录nodeToReplace的父节点
+      parentOfReplaceNode = nodeToReplace->parent;
       originalColor = nodeToReplace->color;
       childOfReplaceNode = nodeToReplace->right;
       if (nodeToReplace->parent == nodeToDelete) {
@@ -364,7 +377,15 @@ private:
     delete nodeToDelete;
 
     if (originalColor == Color::BLACK) {
-      removeFixup(childOfReplaceNode);
+      if (childOfReplaceNode != nullptr) {
+        removeFixup(childOfReplaceNode);
+      } else {
+        // 被替换的是叶子节点, 所以childOfReplaceNode为空, 无法从其开始修复,
+        // 需要从被替换节点的父节点出判断
+        if (replaceNodeColor == Color::BLACK) {
+          leftRotate(parentOfReplaceNode);
+        }
+      }
     }
   }
 
@@ -392,6 +413,7 @@ public:
       if (node->color == Color::BLACK) {
         height++;
       }
+      node = node->left;
     }
     return height;
   }
@@ -412,6 +434,12 @@ public:
     }
     return root->getLen();
   }
+
+  int len() { return size; }
+
+  bool empty() { return size == 0; }
+
+  bool isRootBlack() { return root == nullptr || root->color == Color::BLACK; }
 
   // 中序遍历打印
   void print() const {

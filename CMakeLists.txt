@@ -36,7 +36,21 @@ add_executable(
   tests/list_test.cpp
 )
 target_link_libraries(
-    list_test
+  list_test
+  GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(deque_test)
+gtest_discover_tests(list_test)
+
+# rbTree_test
+add_executable(
+  rbTree_test
+  tests/rbTree_test.cpp
+)
+target_link_libraries(
+  rbTree_test
   GTest::gtest_main
 )
 
