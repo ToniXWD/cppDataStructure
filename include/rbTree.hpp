@@ -486,6 +486,8 @@ private:
       } else {
         // 交换节点就是删除节点的右孩子
         // 直接将交换节点替代删除节点
+        // 交换的节点只可能有右孩子
+        childOfReplaceNode = nodeToReplace->right;
 
         // 将删除节点的左孩子分配给交换节点
         nodeToReplace->left = nodeToDelete->left;

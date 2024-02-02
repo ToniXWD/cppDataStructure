@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <gtest/gtest.h>
+#include <iostream>
 #include <random>
 #include <vector>
 
@@ -403,7 +404,7 @@ TEST(RbTreeTest, RandomOperation) {
   std::mt19937 gen(rd()); // 使用 Mersenne Twister 生成器
 
   // 定义随机数分布，这里以生成[0, 99]范围内的随机整数为例
-  std::uniform_int_distribution<> dis(0, 100);
+  std::uniform_int_distribution<> dis(0, 2000000);
 
   std::vector<int> collect;
 
@@ -415,6 +416,8 @@ TEST(RbTreeTest, RandomOperation) {
       collect.push_back(random_number);
     }
   }
+  std::sort(collect.begin(), collect.end());
+  // std::cout << "vector长度为: " << collect.size() << std::endl;
 
   while (!collect.empty()) {
     int idx = dis(gen) % collect.size();
@@ -422,18 +425,19 @@ TEST(RbTreeTest, RandomOperation) {
     collect.erase(collect.begin() + idx);
 
     tree.remove(del_target);
-    // EXPECT_TRUE(tree.len() == tree.getSizeByTranverse());
-    // EXPECT_TRUE(tree.isBlackLenLegal());
-    // EXPECT_EQ(tree.len(), collect.size());
-    // EXPECT_TRUE(tree.isRootBlack());
-    std::cout << "**********************************************************"
-                 "************************************************"
-              << std::endl;
-    if (!tree.isBlackLenLegal() || !tree.isNoDoubleRed()) {
-      std::cout << "remove " << del_target << "error: " << std::endl;
-      tree.Print();
-      ASSERT_TRUE(tree.isBlackLenLegal());
-    }
-    tree.Print();
+    ASSERT_TRUE(tree.len() == tree.getSizeByTranverse());
+    ASSERT_TRUE(tree.isBlackLenLegal());
+    ASSERT_TRUE(tree.isNoDoubleRed());
+    EXPECT_EQ(tree.len(), collect.size());
+    ASSERT_TRUE(tree.isRootBlack());
+    // std::cout << "**********************************************************"
+    //              "************************************************"
+    //           << std::endl;
+    // if (!tree.isBlackLenLegal() || !tree.isNoDoubleRed()) {
+    //   std::cout << "remove " << del_target << "error: " << std::endl;
+    //   tree.Print();
+    //   ASSERT_TRUE(tree.isBlackLenLegal());
+    // }
+    // tree.Print();
   }
 }
