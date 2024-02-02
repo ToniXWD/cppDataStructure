@@ -1,4 +1,5 @@
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -16,7 +17,8 @@ public:
   // 构造函数
   Node(const Key &k, Color c, Node<Key> *p = nullptr)
       : key(k), color(c), left(nullptr), right(nullptr), parent(p) {}
-  Node() {}
+  Node()
+      : color(Color::BLACK), left(nullptr), right(nullptr), parent(nullptr) {}
 
   int getLen() {
     // 获取某个子树的节点数量
@@ -25,10 +27,10 @@ public:
     }
     int l_len = 0;
     int r_len = 0;
-    if (left) {
+    if (left != nullptr) {
       l_len = left->getLen();
     }
-    if (right) {
+    if (right != nullptr) {
       r_len = right->getLen();
     }
     return 1 + l_len + r_len;
@@ -54,7 +56,73 @@ public:
 
     return color == Color::BLACK ? 1 + hei_l : hei_l;
   }
+
+  bool isNoDoubleRed() {
+    bool left_legal = true;
+    bool right_legal = true;
+    if (left != nullptr) {
+      left_legal = left->isNoDoubleRed();
+    }
+    if (right != nullptr) {
+      right_legal = right->isNoDoubleRed();
+    }
+    if (left_legal == false || right_legal == false) {
+      return false;
+    }
+    if (color == Color::BLACK) {
+      return true;
+    }
+    if (left != nullptr && left->color == Color::RED) {
+      return false;
+    }
+    if (right != nullptr && right->color == Color::RED) {
+      return false;
+    }
+    if (parent != nullptr && parent->color == Color::RED) {
+      return false;
+    }
+    return true;
+  }
 };
+
+template <typename Key>
+void printTreeHelper(Node<Key> *root, std::string indent = "",
+                     bool last = true) {
+  // 当前节点为null，直接返回
+  if (root == nullptr) {
+    return;
+  }
+
+  // 打印缩进
+  std::cout << indent;
+  if (last) {
+    std::cout << "R----";
+    // 更新缩进标记为垂直线
+    indent += "   ";
+  } else {
+    std::cout << "L----";
+    // 更新缩进标记
+    indent += "|  ";
+  }
+
+  // 打印当前节点的颜色和键值
+  std::string color = root->color == Color::RED ? "RED" : "BLACK";
+  std::cout << root->key << "(" << color << ")" << std::endl;
+
+  // 递归打印左子树
+  printTreeHelper(root->left, indent, false);
+  // 递归打印右子树
+  printTreeHelper(root->right, indent, true);
+}
+
+template <typename Key> void printTree(Node<Key> *root) {
+  if (root == nullptr) {
+    std::cout << "<empty tree>" << std::endl;
+    return;
+  }
+  // 调用递归辅助函数
+  printTreeHelper(root);
+}
 
 template <typename Key> class RedBlackTree {
 private:
@@ -251,7 +319,6 @@ private:
       return;
     }
     while (node != root) {
-      // 如果节点是黑色
       if (node == node->parent->left) {
         // 是其父节点的左子节点
         Node<Key> *sibling = node->parent->right;
@@ -274,6 +341,10 @@ private:
           // 因为将兄弟节点的颜色设置为红色后, 从父节点开始的路径高度相同了,
           // 但又比其他的路径高度小了
           node = node->parent;
+          if (node->color == Color::RED) {
+            node->color = Color::BLACK;
+            node = root;
+          }
         } else {
           // 兄弟节点为黑色, 且至少有一个红色孩子
           // 下面的if统一将兄弟节点设置为右孩子为红色
@@ -304,6 +375,10 @@ private:
             getColor(sibling->left) == Color::BLACK) {
           setColor(sibling, Color::RED);
           node = node->parent;
+          if (node->color == Color::RED) {
+            node->color = Color::BLACK;
+            node = root;
+          }
         } else {
           if (getColor(sibling->left) == Color::BLACK) {
             setColor(sibling->right, Color::BLACK);
@@ -353,52 +428,93 @@ private:
   // 删除节点
   void deleteNode(Node<Key> *nodeToDelete) {
     Node<Key> *nodeToReplace = nodeToDelete;
-    Node<Key> *childOfReplaceNode;
+    Node<Key> *childOfReplaceNode = nullptr;
     Node<Key> *parentOfReplaceNode;
     Color originalColor = nodeToReplace->color;
 
     if (!nodeToDelete->left) {
       // 要删除的节点没有左子树, 两个子树都为空的情况也包含在内
-      childOfReplaceNode = nodeToDelete->right;
+      nodeToReplace = nodeToDelete->right;
       parentOfReplaceNode = nodeToDelete->parent;
-      replaceNode(nodeToDelete, nodeToDelete->right);
+      // 交换的节点虽然不需要删除, 但删除的颜色却等效于交换的节点
+      originalColor = getColor(nodeToReplace);
+      replaceNode(nodeToDelete, nodeToReplace);
     } else if (!nodeToDelete->right) {
       // 要删除的节点没有右子树
-      childOfReplaceNode = nodeToDelete->left;
+      nodeToReplace = nodeToDelete->left;
       parentOfReplaceNode = nodeToDelete->parent;
-      replaceNode(nodeToDelete, nodeToDelete->left);
+      // 交换的节点虽然不需要删除, 但删除的颜色却等效于交换的节点F
+      originalColor = getColor(nodeToReplace);
+      replaceNode(nodeToDelete, nodeToReplace);
     } else {
       // 2个子树都存在
       // 用要删除节点在中序遍历中的后继来替换当前要删除的元素
       nodeToReplace = findMinimumNode(nodeToDelete->right);
-      // 因为后面的childOfReplaceNode可能为空, 所有记录nodeToReplace的父节点
+      // 交换的节点虽然不需要删除, 但删除的颜色却等效于交换的节点
       originalColor = nodeToReplace->color;
-      parentOfReplaceNode = nodeToReplace->parent;
-      childOfReplaceNode = nodeToReplace->right;
-      if (nodeToReplace->parent == nodeToDelete) {
-        // 要删除节点的右子树的最小节点就是右孩子
-        if (childOfReplaceNode)
-          // 用来替换的节点(实际删除的节点)存在非空右子树)
-          childOfReplaceNode->parent = nodeToReplace;
-      } else {
-        // 要删除节点的右子树的最小节点不是右孩子
-        replaceNode(nodeToReplace, nodeToReplace->right);
+      if (nodeToReplace != nodeToDelete->right) {
+        // 交换节点不是删除节点的右孩子
+        parentOfReplaceNode = nodeToReplace->parent;
+        // 交换的节点只可能有右孩子
+        childOfReplaceNode = nodeToReplace->right;
+        // 将交换的节点的右孩子托付给交换节点的父亲
+        parentOfReplaceNode->left = childOfReplaceNode;
+        if (childOfReplaceNode != nullptr) {
+          // 交换的节点的右孩子非空, 重新指定其父节点
+          childOfReplaceNode->parent = parentOfReplaceNode;
+        }
+        // 现在交换2个节点
+        // 将删除节点的孩子分配给交换节点
+        nodeToDelete->left->parent = nodeToReplace;
+        nodeToDelete->right->parent = nodeToReplace;
+        nodeToReplace->left = nodeToDelete->left;
         nodeToReplace->right = nodeToDelete->right;
-        nodeToReplace->right->parent = nodeToReplace;
-      }
-      // 后继替换要删除的节点
-      replaceNode(nodeToDelete, nodeToReplace);
-      nodeToReplace->left = nodeToDelete->left;
-      nodeToReplace->left->parent = nodeToReplace;
-      nodeToReplace->right = nodeToDelete->right;
-      if (nodeToReplace->right == nodeToReplace) {
-        // 后继就是右孩子的情况
-        nodeToReplace->right = nullptr;
-        parentOfReplaceNode = nodeToReplace;
+        // 连接删除节点的父亲和交换节点
+        if (nodeToDelete->parent != nullptr) {
+          if (nodeToDelete == nodeToDelete->parent->left) {
+            nodeToDelete->parent->left = nodeToReplace;
+            nodeToReplace->parent = nodeToDelete->parent;
+          } else {
+            nodeToDelete->parent->right = nodeToReplace;
+            nodeToReplace->parent = nodeToDelete->parent;
+          }
+        } else {
+          // 如果删除节点就是根节点, 需要重新分配根节点为交换节点
+          root = nodeToReplace;
+          root->parent = nullptr;
+        }
       } else {
-        nodeToReplace->right->parent = nodeToReplace;
+        // 交换节点就是删除节点的右孩子
+        // 直接将交换节点替代删除节点
+
+        // 将删除节点的左孩子分配给交换节点
+        nodeToReplace->left = nodeToDelete->left;
+        nodeToDelete->left->parent = nodeToReplace;
+        // 连接删除节点的父亲和交换节点
+        if (nodeToDelete->parent != nullptr) {
+          if (nodeToDelete == nodeToDelete->parent->left) {
+            nodeToDelete->parent->left = nodeToReplace;
+            nodeToReplace->parent = nodeToDelete->parent;
+          } else {
+            nodeToDelete->parent->right = nodeToReplace;
+            nodeToReplace->parent = nodeToDelete->parent;
+          }
+        } else {
+          // 如果删除节点就是根节点, 需要重新分配根节点为交换节点
+          root = nodeToReplace;
+          root->parent = nullptr;
+        }
+        // 这种情况下, 交换节点的父亲就是交换节点自己
+        parentOfReplaceNode = nodeToReplace;
       }
+    }
+
+    // 将替换的节点颜色着色为删除节点的颜色
+    if (nodeToReplace != nullptr) {
       nodeToReplace->color = nodeToDelete->color;
+    } else {
+      // 替换的节点是空节点, 所以损失的就是删除节点的颜色
+      originalColor = nodeToDelete->color;
     }
 
     if (originalColor == Color::BLACK) {
@@ -420,6 +536,7 @@ private:
         removeNil();
       }
     }
+
     delete nodeToDelete;
   }
 
@@ -469,6 +586,13 @@ public:
     }
   }
 
+  bool isNoDoubleRed() {
+    if (root == nullptr) {
+      return true;
+    }
+    return root->isNoDoubleRed();
+  }
+
   int getSizeByTranverse() {
     // 节点总数量
     if (root == nullptr) {
@@ -488,6 +612,8 @@ public:
     inorderTraversal(root);
     std::cout << std::endl;
   }
+
+  void Print() { printTreeHelper(root, " "); }
 
   // 析构函数
   ~RedBlackTree() {
