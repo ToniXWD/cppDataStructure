@@ -40,10 +40,6 @@ target_link_libraries(
   GTest::gtest_main
 )
 
-include(GoogleTest)
-gtest_discover_tests(deque_test)
-gtest_discover_tests(list_test)
-
 # rbTree_test
 add_executable(
   rbTree_test
@@ -57,7 +53,7 @@ target_link_libraries(
 include(GoogleTest)
 gtest_discover_tests(deque_test)
 gtest_discover_tests(list_test)
-
+gtest_discover_tests(rbTree_test)
 
 
 add_executable(

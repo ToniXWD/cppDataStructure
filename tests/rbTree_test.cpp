@@ -102,7 +102,6 @@ TEST(RbTreeTest, RemoveTest2) {
   // 插入元素
   mySet.insert(5);
 
-
   EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
   EXPECT_TRUE(mySet.isBlackLenLegal());
   EXPECT_EQ(mySet.len(), 1);
@@ -120,5 +119,95 @@ TEST(RbTreeTest, RemoveTest2) {
   EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
   EXPECT_TRUE(mySet.isBlackLenLegal());
   EXPECT_EQ(mySet.len(), 1);
+  EXPECT_TRUE(mySet.isRootBlack());
+}
+
+TEST(RbTreeTest, RemoveRoot) {
+  // 创建 RedBlackTree 对象
+  RedBlackTree<int> mySet;
+
+  EXPECT_TRUE(mySet.empty());
+
+  // 插入元素
+  mySet.insert(5);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 1);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  // 插入元素
+  mySet.insert(10);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 2);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  // 删除根节点
+  mySet.remove(5);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 1);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  // 删除根节点
+  mySet.remove(10);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 0);
+  EXPECT_TRUE(mySet.isRootBlack());
+  EXPECT_TRUE(mySet.empty());
+}
+
+TEST(RbTreeTest, DoubleBlackTest) {
+  // 创建 RedBlackTree 对象
+  RedBlackTree<int> mySet;
+
+  EXPECT_TRUE(mySet.empty());
+
+  // 插入元素
+  mySet.insert(10);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 1);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  mySet.insert(5);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 2);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  mySet.insert(50);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 3);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  mySet.insert(30);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 4);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  mySet.insert(36);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 5);
+  EXPECT_TRUE(mySet.isRootBlack());
+
+  mySet.remove(5);
+
+  EXPECT_TRUE(mySet.len() == mySet.getSizeByTranverse());
+  EXPECT_TRUE(mySet.isBlackLenLegal());
+  EXPECT_EQ(mySet.len(), 4);
   EXPECT_TRUE(mySet.isRootBlack());
 }

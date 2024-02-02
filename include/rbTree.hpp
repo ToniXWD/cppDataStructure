@@ -18,6 +18,7 @@ private:
     // 构造函数
     Node(const Key &k, Color c, Node *p = nullptr)
         : key(k), color(c), left(nullptr), right(nullptr), parent(p) {}
+    Node() {}
 
     int getLen() {
       // 获取某个子树的节点数量
@@ -59,51 +60,52 @@ private:
 
   Node *root;
   int size;
+  Node *Nil;
 
   // 左旋
-  void leftRotate(Node *root) {
-    Node *r_son = root->right;
+  void leftRotate(Node *node) {
+    Node *r_son = node->right;
 
-    // 将右孩子的左子树交付给root作为右子树
-    root->right = r_son->left;
+    // 将右孩子的左子树交付给node作为右子树
+    node->right = r_son->left;
 
     // 为右孩子的左子树安排新的父亲为root
     if (r_son->left) {
-      r_son->left->parent = root;
+      r_son->left->parent = node;
     }
 
-    // 将右孩子作为新的root, 分配原root的父节点并协调其关系
-    r_son->parent = root->parent;
-    if (!root->parent) {
+    // 将右孩子作为新的node, 分配原node的父节点并协调其关系
+    r_son->parent = node->parent;
+    if (!node->parent) {
       root = r_son;
-    } else if (root == root->parent->left) {
-      root->parent->left = r_son;
+    } else if (node == node->parent->left) {
+      node->parent->left = r_son;
     } else {
-      root->parent->right = r_son;
+      node->parent->right = r_son;
     }
 
-    // root变成了右孩子的左节点
-    r_son->left = root;
-    root->parent = r_son;
+    // node变成了右孩子的左节点
+    r_son->left = node;
+    node->parent = r_son;
   }
 
   // 右旋
-  void rightRotate(Node *root) {
-    Node *l_son = root->left;
-    root->left = l_son->right;
+  void rightRotate(Node *node) {
+    Node *l_son = node->left;
+    node->left = l_son->right;
     if (l_son->right) {
-      l_son->right->parent = root;
+      l_son->right->parent = node;
     }
-    l_son->parent = root->parent;
-    if (!root->parent) {
+    l_son->parent = node->parent;
+    if (!node->parent) {
       root = l_son;
-    } else if (root == root->parent->left) {
-      root->parent->left = l_son;
+    } else if (node == node->parent->left) {
+      node->parent->left = l_son;
     } else {
-      root->parent->right = l_son;
+      node->parent->right = l_son;
     }
-    l_son->right = root;
-    root->parent = l_son;
+    l_son->right = node;
+    node->parent = l_son;
   }
 
   // 插入修复
@@ -245,6 +247,9 @@ private:
   }
 
   void removeFixup(Node *node) {
+    if (node == Nil && node->parent == nullptr) {
+      return;
+    }
     while (node != root && getColor(node) == Color::BLACK) {
       // 如果节点是黑色
       if (node == node->parent->left) {
@@ -332,30 +337,43 @@ private:
     node->color = color;
   }
 
+  void removeNil() {
+    if (Nil == nullptr) {
+      return;
+    }
+    if (Nil->parent != nullptr) {
+      if (Nil == Nil->parent->left) {
+        Nil->parent->left = nullptr;
+      } else {
+        Nil->parent->right = nullptr;
+      }
+    }
+  }
+
   // 删除节点
   void deleteNode(Node *nodeToDelete) {
     Node *nodeToReplace = nodeToDelete;
     Node *childOfReplaceNode;
     Node *parentOfReplaceNode;
     Color originalColor = nodeToReplace->color;
-    Color replaceNodeColor;
 
     if (!nodeToDelete->left) {
       // 要删除的节点没有左子树, 两个子树都为空的情况也包含在内
       childOfReplaceNode = nodeToDelete->right;
+      parentOfReplaceNode = nodeToDelete->parent;
       replaceNode(nodeToDelete, nodeToDelete->right);
     } else if (!nodeToDelete->right) {
       // 要删除的节点没有右子树
       childOfReplaceNode = nodeToDelete->left;
+      parentOfReplaceNode = nodeToDelete->parent;
       replaceNode(nodeToDelete, nodeToDelete->left);
     } else {
       // 2个子树都存在
       // 用要删除节点在中序遍历中的后继来替换当前要删除的元素
       nodeToReplace = findMinimumNode(nodeToDelete->right);
-      replaceNodeColor = nodeToReplace->color;
       // 因为后面的childOfReplaceNode可能为空, 所有记录nodeToReplace的父节点
-      parentOfReplaceNode = nodeToReplace->parent;
       originalColor = nodeToReplace->color;
+      parentOfReplaceNode = nodeToReplace->parent;
       childOfReplaceNode = nodeToReplace->right;
       if (nodeToReplace->parent == nodeToDelete) {
         // 要删除节点的右子树的最小节点就是右孩子
@@ -374,24 +392,34 @@ private:
       nodeToReplace->left->parent = nodeToReplace;
       nodeToReplace->color = nodeToDelete->color;
     }
-    delete nodeToDelete;
 
     if (originalColor == Color::BLACK) {
+      // 删除的是黑色节点才需要修复
       if (childOfReplaceNode != nullptr) {
         removeFixup(childOfReplaceNode);
       } else {
         // 被替换的是叶子节点, 所以childOfReplaceNode为空, 无法从其开始修复,
-        // 需要从被替换节点的父节点出判断
-        if (replaceNodeColor == Color::BLACK) {
-          leftRotate(parentOfReplaceNode);
+        // 需要使用哨兵节点替换
+        Nil->parent = parentOfReplaceNode;
+        if (parentOfReplaceNode != nullptr) {
+          if (parentOfReplaceNode->left == nullptr) {
+            parentOfReplaceNode->left = Nil;
+          } else {
+            parentOfReplaceNode->right = Nil;
+          }
         }
+        removeFixup(Nil);
+        removeNil();
       }
     }
+    delete nodeToDelete;
   }
 
 public:
   // 构造函数
-  RedBlackTree() : root(nullptr), size(0) {}
+  RedBlackTree() : root(nullptr), size(0), Nil(new Node()) {
+    Nil->color = Color::BLACK;
+  }
 
   // 插入元素
   void insert(const Key &key) { insertNode(key); }
