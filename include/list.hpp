@@ -55,11 +55,11 @@ public:
   size_t size() const { return sz; }
 
   // Overloads the subscript operator for accessing elements by index
-  T &operator[](size_t idx) { return getNodeAt(idx)->data; }
+  T &operator[](size_t idx) { return getNodeAt(idx)->val; }
 
   // Overloads the subscript operator for accessing elements by index (const
   // version)
-  const T &operator[](size_t idx) const { return getNodeAt(idx)->data; }
+  const T &operator[](size_t idx) const { return getNodeAt(idx)->val; }
 
   // Removes the last element from the list
   void pop_back() {

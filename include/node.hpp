@@ -8,12 +8,11 @@
 
 template <typename T> struct Node {
 public:
-  T data;     // 数据
-  Node *next; // 指向下一个节点的指针
-  Node *prev; // 指向前一个节点的指针
-  // 构造函数
+  T val;
+  Node *next;
+  Node *prev;
   Node(const T &value, Node *nextNode = nullptr, Node *prevNode = nullptr)
-      : data(value), next(nextNode), prev(prevNode) {}
+      : val(value), next(nextNode), prev(prevNode) {}
 };
 
 enum class Color { RED, BLACK };

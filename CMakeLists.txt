@@ -12,6 +12,6 @@ include_directories(include)
 add_subdirectory(tests)
 
 add_executable(
-  main
-  main.cpp
+  example
+  example.cpp
 )
