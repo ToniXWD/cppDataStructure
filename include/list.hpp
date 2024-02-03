@@ -1,3 +1,5 @@
+#pragma once
+
 #include "node.hpp"
 #include <iostream>
 #include <stdexcept>
