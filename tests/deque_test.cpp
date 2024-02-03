@@ -24,15 +24,15 @@ EXPECT_EQ(myDeque[4], 3);
 EXPECT_EQ(myDeque[5], 4);
 EXPECT_EQ(myDeque[6], 5);
 EXPECT_EQ(myDeque[7], 6);
-EXPECT_EQ(myDeque.getSize(), 8);
+EXPECT_EQ(myDeque.size(), 8);
 
 myDeque.pop_front();
-EXPECT_EQ(myDeque.getSize(), 7);
+EXPECT_EQ(myDeque.size(), 7);
 EXPECT_EQ(myDeque[0], 0);
 EXPECT_EQ(myDeque[6], 6);
 
 myDeque.pop_back();
-EXPECT_EQ(myDeque.getSize(), 6);
+EXPECT_EQ(myDeque.size(), 6);
 EXPECT_EQ(myDeque[0], 0);
 EXPECT_EQ(myDeque[5], 5);
 }

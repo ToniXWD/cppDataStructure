@@ -1,175 +1,113 @@
+#include "node.hpp"
 #include <iostream>
 #include <stdexcept>
 
+// Templated doubly linked list class
 template <typename T> class List {
 private:
-  // 定义节点结构
-  struct Node {
-    T data;     // 数据
-    Node *next; // 指向下一个节点的指针
-    Node *prev; // 指向前一个节点的指针
+  Node<T> *head; // Pointer to the first node of the list
+  Node<T> *tail; // Pointer to the last node of the list
+  size_t sz;     // Number of nodes in the list
 
-    // 构造函数
-    Node(const T &value, Node *nextNode = nullptr, Node *prevNode = nullptr)
-        : data(value), next(nextNode), prev(prevNode) {}
-  };
-
-  Node *head;  // 头节点指针
-  Node *tail;  // 尾节点指针
-  size_t size; // 链表中节点的数量
+  // Helper function to retrieve the node at a specific index
+  Node<T> *getNodeAt(size_t idx) const {
+    Node<T> *curr = head;
+    for (size_t i = 0; i < idx; ++i) {
+      if (curr == nullptr)
+        throw std::out_of_range("Index out of range");
+      curr = curr->next;
+    }
+    return curr;
+  }
 
 public:
-  // 构造函数
-  List() : head(nullptr), tail(nullptr), size(0) {}
+  // Constructor initializes an empty list
+  List() : head(nullptr), tail(nullptr), sz(0) {}
 
-  // 析构函数
+  // Destructor deallocates all nodes
   ~List() { clear(); }
 
-  // 在链表末尾添加元素
-  void push_back(const T &value) {
-    // 创建新的节点
-    Node *newNode = new Node(value, nullptr, tail);
-
-    if (tail) {
-      // 如果链表非空，将尾节点的 next 指针指向新节点
-      tail->next = newNode;
+  // Adds a new element to the end of the list
+  void push_back(const T &val) {
+    Node<T> *newN = new Node<T>(val, nullptr, tail);
+    if (tail != nullptr) {
+      tail->next = newN;
     } else {
-      // 如果链表为空，新节点同时也是头节点
-      head = newNode;
+      head = newN;
     }
-
-    // 更新尾节点指针和链表大小
-    tail = newNode;
-    ++size;
+    tail = newN;
+    ++sz;
   }
 
-  // 在链表开头添加元素
-  void push_front(const T &value) {
-    // 创建新的节点
-    Node *newNode = new Node(value, head, nullptr);
-
-    if (head) {
-      // 如果链表非空，将头节点的 prev 指针指向新节点
-      head->prev = newNode;
+  // Adds a new element to the front of the list
+  void push_front(const T &val) {
+    Node<T> *newN = new Node<T>(val, head, nullptr);
+    if (head != nullptr) {
+      head->prev = newN;
     } else {
-      // 如果链表为空，新节点同时也是尾节点
-      tail = newNode;
+      tail = newN;
     }
-
-    // 更新头节点指针和链表大小
-    head = newNode;
-    ++size;
+    head = newN;
+    ++sz;
   }
 
-  // 获取链表中节点的数量
-  size_t getSize() const { return size; }
+  // Returns the number of elements in the list
+  size_t size() const { return sz; }
 
-  // 访问链表中的元素
-  T &operator[](size_t index) {
-    // 从头节点开始遍历链表，找到第 index 个节点
-    Node *current = head;
-    for (size_t i = 0; i < index; ++i) {
-      if (!current) {
-        // 如果 index 超出链表长度，则抛出异常
-        throw std::out_of_range("Index out of range");
-      }
-      current = current->next;
-    }
+  // Overloads the subscript operator for accessing elements by index
+  T &operator[](size_t idx) { return getNodeAt(idx)->data; }
 
-    // 返回节点中的数据
-    return current->data;
-  }
+  // Overloads the subscript operator for accessing elements by index (const
+  // version)
+  const T &operator[](size_t idx) const { return getNodeAt(idx)->data; }
 
-  // const版本的访问链表中的元素
-  const T &operator[](size_t index) const {
-    // 从头节点开始遍历链表，找到第 index 个节点
-    Node *current = head;
-    for (size_t i = 0; i < index; ++i) {
-      if (!current) {
-        // 如果 index 超出链表长度，则抛出异常
-        throw std::out_of_range("Index out of range");
-      }
-      current = current->next;
-    }
-
-    // 返回节点中的数据
-    return current->data;
-  }
-
-  // 删除链表末尾的元素
+  // Removes the last element from the list
   void pop_back() {
-    if (size > 0) {
-      // 获取尾节点的前一个节点
-      Node *newTail = tail->prev;
-
-      // 删除尾节点
+    if (tail != nullptr) {
+      Node<T> *newT = tail->prev;
       delete tail;
-
-      // 更新尾节点指针和链表大小
-      tail = newTail;
-      if (tail) {
+      tail = newT;
+      if (tail != nullptr) {
         tail->next = nullptr;
       } else {
-        head = nullptr; // 如果链表为空，头节点也置为空
+        head = nullptr;
       }
-
-      --size;
+      --sz;
     }
   }
 
-  // 删除链表开头的元素
+  // Removes the first element from the list
   void pop_front() {
-    if (size > 0) {
-      // 获取头节点的下一个节点
-      Node *newHead = head->next;
-
-      // 删除头节点
+    if (head != nullptr) {
+      Node<T> *newH = head->next;
       delete head;
-
-      // 更新头节点指针和链表大小
-      head = newHead;
-      if (head) {
+      head = newH;
+      if (head != nullptr) {
         head->prev = nullptr;
       } else {
-        tail = nullptr; // 如果链表为空，尾节点也置为空
+        tail = nullptr;
       }
-
-      --size;
+      --sz;
     }
   }
 
-  // 清空链表
+  // Removes all elements from the list and deallocates the nodes
   void clear() {
-    while (head) {
-      // 从头节点开始，依次删除节点
-      Node *temp = head;
+    Node<T> *curr;
+    while ((curr = head) != nullptr) {
       head = head->next;
-      delete temp;
+      delete curr;
     }
-
-    // 更新尾节点指针和链表大小
     tail = nullptr;
-    size = 0;
+    sz = 0;
   }
 
-  // 使用迭代器遍历链表的开始位置
-  Node *begin() { return head; }
-
-  // 使用迭代器遍历链表的结束位置
-  Node *end() { return nullptr; }
-
-  // 使用迭代器遍历链表的开始位置（const版本）
-  const Node *begin() const { return head; }
-
-  // 使用迭代器遍历链表的结束位置（const版本）
-  const Node *end() const { return nullptr; }
-
-  // 打印链表中的元素
-  void printElements() const {
-    std::cout << "Elements:";
-    for (Node *current = head; current; current = current->next) {
-      std::cout << " " << current->data;
-    }
-    std::cout << std::endl;
-  }
+  // Returns an iterator to the beginning of the list
+  Node<T> *begin() { return head; }
+  // Returns a const iterator to the beginning of the list
+  const Node<T> *begin() const { return head; }
+  // Returns an iterator to the end of the list (nullptr in this case)
+  Node<T> *end() { return nullptr; }
+  // Returns a const iterator to the end of the list (nullptr in this case)
+  const Node<T> *end() const { return nullptr; }
 };

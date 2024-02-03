@@ -4,123 +4,120 @@
 
 template <typename T> class Vector {
 private:
-  T *elements;     // 指向动态数组的指针
-  size_t capacity; // 数组的容量
-  size_t size;     // 数组中元素的个数
+  T *elems;   // Pointer to the dynamic array
+  size_t cap; // Capacity of the array
+  size_t sz;  // Number of elements in the array
 
 public:
-  // 构造函数
-  Vector() : elements(nullptr), capacity(0), size(0) {}
+  // Constructor
+  Vector() : elems(nullptr), cap(0), sz(0) {}
 
-  // 析构函数
-  ~Vector() { delete[] elements; }
+  // Destructor
+  ~Vector() { delete[] elems; }
 
-  // 拷贝构造函数
-  Vector(const Vector &other) : capacity(other.capacity), size(other.size) {
-    elements = new T[capacity];
-    std::copy(other.elements, other.elements + size, elements);
+  // Copy constructor
+  Vector(const Vector &other) : cap(other.cap), sz(other.sz) {
+    elems = new T[cap];
+    std::copy(other.elems, other.elems + sz, elems);
   }
 
-  // 拷贝赋值操作符
+  // Copy assignment operator
   Vector &operator=(const Vector &other) {
     if (this != &other) {
-      delete[] elements;
-      capacity = other.capacity;
-      size = other.size;
-      elements = new T[capacity];
-      std::copy(other.elements, other.elements + size, elements);
+      delete[] elems;
+      cap = other.cap;
+      sz = other.sz;
+      elems = new T[cap];
+      std::copy(other.elems, other.elems + sz, elems);
     }
     return *this;
   }
 
-  // 添加元素到数组末尾
-  void push_back(const T &value) {
-    if (size == capacity) {
-      // 如果数组已满，扩展容量
-      reserve(capacity == 0 ? 1 : 2 * capacity);
+  // Add an element to the end of the array
+  void push_back(const T &val) {
+    if (sz == cap) {
+      reserve(cap == 0 ? 1 : 2 * cap); // Expand capacity if array is full
     }
-    elements[size++] = value;
+    elems[sz++] = val;
   }
 
-  // 获取数组中元素的个数
-  size_t getSize() const { return size; }
+  // Get the number of elements in the array
+  size_t getSize() const { return sz; }
 
-  // 获取数组的容量
-  size_t getCapacity() const { return capacity; }
+  // Get the array capacity
+  size_t getCapacity() const { return cap; }
 
-  // 访问数组中的元素
-  T &operator[](size_t index) {
-    // 检查索引是否越界
-    if (index >= size) {
+  // Access an element in the array
+  T &operator[](size_t idx) {
+    if (idx >= sz) {
       throw std::out_of_range("Index out of range");
     }
-    return elements[index];
+    return elems[idx];
   }
 
-  // const版本的访问数组中的元素
-  const T &operator[](size_t index) const {
-    // 检查索引是否越界
-    if (index >= size) {
+  // Access an element in the array (const version)
+  const T &operator[](size_t idx) const {
+    if (idx >= sz) {
       throw std::out_of_range("Index out of range");
     }
-    return elements[index];
+    return elems[idx];
   }
 
-  // 在指定位置插入元素
-  void insert(size_t index, const T &value) {
-    if (index > size) {
+  // Insert an element at a specified position
+  void insert(size_t idx, const T &val) {
+    if (idx > sz) {
       throw std::out_of_range("Index out of range");
     }
-    if (size == capacity) {
-      reserve(capacity == 0 ? 1 : capacity * 2);
+    if (sz == cap) {
+      reserve(cap == 0 ? 1 : cap * 2);
     }
-    for (size_t i = size; i > index; --i) {
-      elements[i] = elements[i - 1];
+    for (size_t i = sz; i > idx; --i) {
+      elems[i] = elems[i - 1];
     }
-    elements[index] = value;
-    ++size;
+    elems[idx] = val;
+    ++sz;
   }
 
-  // 删除数组末尾的元素
+  // Remove the last element from the array
   void pop_back() {
-    if (size > 0) {
-      --size;
+    if (sz > 0) {
+      --sz;
     }
   }
 
-  // 清空数组
-  void clear() { size = 0; }
+  // Clear the array
+  void clear() { sz = 0; }
 
-  // 使用迭代器遍历数组的开始位置
-  T *begin() { return elements; }
+  // Begin iterator
+  T *begin() { return elems; }
 
-  // 使用迭代器遍历数组的结束位置
-  T *end() { return elements + size; }
+  // End iterator
+  T *end() { return elems + sz; }
 
-  // 使用迭代器遍历数组的开始位置（const版本）
-  const T *begin() const { return elements; }
+  // Begin iterator (const version)
+  const T *begin() const { return elems; }
 
-  // 使用迭代器遍历数组的结束位置（const版本）
-  const T *end() const { return elements + size; }
+  // End iterator (const version)
+  const T *end() const { return elems + sz; }
 
-  // 打印数组中的元素
-  void printElements() const {
+  // Print elements in the array
+  void print() const {
     std::cout << "Elements:";
-    for (size_t i = 0; i < size; ++i) {
-      std::cout << " " << elements[i];
+    for (size_t i = 0; i < sz; ++i) {
+      std::cout << " " << elems[i];
     }
     std::cout << std::endl;
   }
 
 private:
-  // 扩展数组容量
-  void reserve(size_t newCapacity) {
-    if (newCapacity > capacity) {
-      T *newElements = new T[newCapacity];
-      std::copy(elements, elements + size, newElements);
-      delete[] elements;
-      elements = newElements;
-      capacity = newCapacity;
+  // Expand array capacity
+  void reserve(size_t newCap) {
+    if (newCap > cap) {
+      T *newElems = new T[newCap];
+      std::copy(elems, elems + sz, newElems);
+      delete[] elems;
+      elems = newElems;
+      cap = newCap;
     }
   }
 };

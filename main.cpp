@@ -19,20 +19,19 @@ int deque_test() {
 
   // 打印元素和deque大小
   std::cout << "Original Deque:";
-  myDeque.printElements();
-  std::cout << "Size: " << myDeque.getSize() << std::endl;
+
+  std::cout << "Size: " << myDeque.size() << std::endl;
 
   // 从前端和后端移除元素
   myDeque.pop_front();
   myDeque.pop_back();
   std::cout << "Deque after pop_front and pop_back:";
-  myDeque.printElements();
 
   // 清空deque
   myDeque.clear();
   std::cout << "Deque after clear:";
-  myDeque.printElements();
-  std::cout << "Size: " << myDeque.getSize() << std::endl;
+
+  std::cout << "Size: " << myDeque.size() << std::endl;
 
   return 0;
 }
@@ -48,13 +47,12 @@ int list_test() {
 
   // 打印元素和链表大小
   std::cout << "Original List:";
-  myList.printElements();
-  std::cout << "Size: " << myList.getSize() << std::endl;
+
+  std::cout << "Size: " << myList.size() << std::endl;
 
   // 在链表开头添加元素
   myList.push_front(0);
   std::cout << "List after push_front:";
-  myList.printElements();
 
   // 访问链表中的元素
   std::cout << "Element at index 2: " << myList[2] << std::endl;
@@ -62,18 +60,16 @@ int list_test() {
   // 删除链表末尾的元素
   myList.pop_back();
   std::cout << "List after pop_back:";
-  myList.printElements();
 
   // 删除链表开头的元素
   myList.pop_front();
   std::cout << "List after pop_front:";
-  myList.printElements();
 
   // 清空链表
   myList.clear();
   std::cout << "List after clear:";
-  myList.printElements();
-  std::cout << "Size: " << myList.getSize() << std::endl;
+
+  std::cout << "Size: " << myList.size() << std::endl;
 
   return 0;
 }
