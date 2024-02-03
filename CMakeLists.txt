@@ -50,6 +50,36 @@ target_link_libraries(
   GTest::gtest_main
 )
 
+# map_test
+add_executable(
+  map_test
+  tests/map_test.cpp
+)
+target_link_libraries(
+  map_test
+  GTest::gtest_main
+)
+
+# set_test
+add_executable(
+  set_test
+  tests/set_test.cpp
+)
+target_link_libraries(
+  set_test
+  GTest::gtest_main
+)
+
+# vector_test
+add_executable(
+  vector_test
+  tests/vector_test.cpp
+)
+target_link_libraries(
+  vector_test
+  GTest::gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(deque_test)
 gtest_discover_tests(list_test)

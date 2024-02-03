@@ -80,40 +80,41 @@ int list_test() {
 
 int rbTree_test() {
   // 创建 RedBlackTree 对象
-  RedBlackTree<int> mySet;
+  RedBlackTree<int, int> tree;
 
   // 插入元素
-  mySet.insert(42);
-  mySet.insert(21);
-  mySet.insert(63);
-  mySet.insert(10);
-  mySet.insert(4);
-  mySet.insert(30);
-  mySet.insert(36);
-  mySet.insert(92);
-  mySet.insert(75);
-  mySet.insert(87);
-  mySet.insert(58);
+  tree.insert(42);
+  tree.insert(21);
+  tree.insert(63);
+  tree.insert(10);
+  tree.insert(4);
+  tree.insert(30);
+  tree.insert(36);
+  tree.insert(92);
+  tree.insert(75);
+  tree.insert(87);
+  tree.insert(58);
 
-  mySet.remove(30);
-  mySet.remove(63);
+  tree.remove(30);
+  tree.remove(63);
 
   // 打印集合
   std::cout << "Original Set:" << std::endl;
-  mySet.print();
+  tree.print();
 
   // 插入重复元素（不会重复插入）
-  mySet.insert(42);
+  tree.insert(42);
 
   // 打印修改后的集合
   std::cout << "Set after inserting duplicate element:" << std::endl;
-  mySet.print();
+  tree.print();
 
-  std::cout << "红黑树长度为: " << mySet.len() << std::endl;
-  std::cout << "红黑树长度为(手动计算): " << mySet.getSizeByTranverse() << std::endl;
-  std::cout << "红黑树高度为: " << mySet.blackHeight() << std::endl;
+  std::cout << "红黑树长度为: " << tree.len() << std::endl;
+  std::cout << "红黑树长度为(手动计算): " << tree.getSizeByTranverse()
+            << std::endl;
+  std::cout << "红黑树高度为: " << tree.blackHeight() << std::endl;
 
-  mySet.remove(42);
+  tree.remove(42);
 
   return 0;
 }
