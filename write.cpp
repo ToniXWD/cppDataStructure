@@ -8,136 +8,94 @@
 
 enum class Color { RED, BLACK };
 
-template <typename Key, typename Val> class RBNode {
-public:
-  Key key;
-  Val val;
-  Color color;
-  RBNode<Key, Val> *left;
-  RBNode<Key, Val> *right;
-  RBNode<Key, Val> *parent;
+template <typename Key> class RedBlackTree {
+  class Node {
+  public:
+    Key key;
+    Color color;
+    Node *left;
+    Node *right;
+    Node *parent;
 
-  // 构造函数
-  RBNode(const Key &k, Color c, RBNode<Key, Val> *p = nullptr)
-      : key(k), color(c), left(nullptr), right(nullptr), parent(p) {}
-  RBNode(const Key &k, const Val &v, Color c, RBNode<Key, Val> *p = nullptr)
-      : key(k), val(v), color(c), left(nullptr), right(nullptr), parent(p) {}
-  RBNode()
-      : color(Color::BLACK), left(nullptr), right(nullptr), parent(nullptr) {}
+    // 构造函数
+    Node(const Key &k, Color c, Node *p = nullptr)
+        : key(k), color(c), left(nullptr), right(nullptr), parent(p) {}
+    Node()
+        : color(Color::BLACK), left(nullptr), right(nullptr), parent(nullptr) {}
 
-  int getLen() {
-    // 获取某个子树的节点数量
-    if (left == nullptr && right == nullptr) {
-      return 1;
-    }
-    int l_len = 0;
-    int r_len = 0;
-    if (left != nullptr) {
-      l_len = left->getLen();
-    }
-    if (right != nullptr) {
-      r_len = right->getLen();
-    }
-    return 1 + l_len + r_len;
-  }
-
-  int getBlackHeight() {
-    // 返回挡墙节点的黑色节点高度, 如果高度不合法, 返回-1
-    if (left == nullptr && right == nullptr) {
-      return color == Color::BLACK ? 1 : 0;
-    }
-    int hei_l = 0;
-    int hei_r = 0;
-    if (left != nullptr) {
-      hei_l = left->getBlackHeight();
-    }
-    if (right != nullptr) {
-      hei_r = right->getBlackHeight();
+    int getLen() {
+      // 获取某个子树的节点数量
+      if (left == nullptr && right == nullptr) {
+        return 1;
+      }
+      int l_len = 0;
+      int r_len = 0;
+      if (left != nullptr) {
+        l_len = left->getLen();
+      }
+      if (right != nullptr) {
+        r_len = right->getLen();
+      }
+      return 1 + l_len + r_len;
     }
 
-    if (hei_l == -1 || hei_r == -1 || hei_l != hei_r) {
-      return -1;
+    int getBlackHeight() {
+      // 返回挡墙节点的黑色节点高度, 如果高度不合法, 返回-1
+      if (left == nullptr && right == nullptr) {
+        return color == Color::BLACK ? 1 : 0;
+      }
+      int hei_l = 0;
+      int hei_r = 0;
+      if (left != nullptr) {
+        hei_l = left->getBlackHeight();
+      }
+      if (right != nullptr) {
+        hei_r = right->getBlackHeight();
+      }
+
+      if (hei_l == -1 || hei_r == -1 || hei_l != hei_r) {
+        return -1;
+      }
+
+      return color == Color::BLACK ? 1 + hei_l : hei_l;
     }
 
-    return color == Color::BLACK ? 1 + hei_l : hei_l;
-  }
-
-  bool isNoDoubleRed() {
-    bool left_legal = true;
-    bool right_legal = true;
-    if (left != nullptr) {
-      left_legal = left->isNoDoubleRed();
-    }
-    if (right != nullptr) {
-      right_legal = right->isNoDoubleRed();
-    }
-    if (left_legal == false || right_legal == false) {
-      return false;
-    }
-    if (color == Color::BLACK) {
+    bool isNoDoubleRed() {
+      bool left_legal = true;
+      bool right_legal = true;
+      if (left != nullptr) {
+        left_legal = left->isNoDoubleRed();
+      }
+      if (right != nullptr) {
+        right_legal = right->isNoDoubleRed();
+      }
+      if (left_legal == false || right_legal == false) {
+        return false;
+      }
+      if (color == Color::BLACK) {
+        return true;
+      }
+      if (left != nullptr && left->color == Color::RED) {
+        return false;
+      }
+      if (right != nullptr && right->color == Color::RED) {
+        return false;
+      }
+      if (parent != nullptr && parent->color == Color::RED) {
+        return false;
+      }
       return true;
     }
-    if (left != nullptr && left->color == Color::RED) {
-      return false;
-    }
-    if (right != nullptr && right->color == Color::RED) {
-      return false;
-    }
-    if (parent != nullptr && parent->color == Color::RED) {
-      return false;
-    }
-    return true;
-  }
-};
+  };
 
-template <typename Key, typename Val>
-void printTreeHelper(RBNode<Key, Val> *root, std::string indent = "",
-                     bool last = true) {
-  // 当前节点为null，直接返回
-  if (root == nullptr) {
-    return;
-  }
-
-  // 打印缩进
-  std::cout << indent;
-  if (last) {
-    std::cout << "R----";
-    // 更新缩进标记为垂直线
-    indent += "   ";
-  } else {
-    std::cout << "L----";
-    // 更新缩进标记
-    indent += "|  ";
-  }
-
-  // 打印当前节点的颜色和键值
-  std::string color = root->color == Color::RED ? "RED" : "BLACK";
-  std::cout << root->key << "(" << color << ")" << std::endl;
-
-  // 递归打印左子树
-  printTreeHelper(root->left, indent, false);
-  // 递归打印右子树
-  printTreeHelper(root->right, indent, true);
-}
-
-template <typename Key, typename Val> void printTree(RBNode<Key, Val> *root) {
-  if (root == nullptr) {
-    std::cout << "<empty tree>" << std::endl;
-    return;
-  }
-  // 调用递归辅助函数
-  printTreeHelper(root);
-}
-
-template <typename Key, typename Val> class RedBlackTree {
 private:
-  RBNode<Key, Val> *root;
+  Node *root;
   size_t size;
-  RBNode<Key, Val> *Nil;
+  Node *Nil;
 
   // 查询某节点
-  RBNode<Key, Val> *getNode(Key key) {
-    RBNode<Key, Val> *cmpNode = root;
+  Node *getNode(Key key) {
+    Node *cmpNode = root;
 
     while (cmpNode) {
       if (key < cmpNode->key) {
@@ -152,8 +110,8 @@ private:
   }
 
   // 左旋
-  void leftRotate(RBNode<Key, Val> *node) {
-    RBNode<Key, Val> *r_son = node->right;
+  void leftRotate(Node *node) {
+    Node *r_son = node->right;
 
     // 将右孩子的左子树交付给node作为右子树
     node->right = r_son->left;
@@ -179,8 +137,8 @@ private:
   }
 
   // 右旋
-  void rightRotate(RBNode<Key, Val> *node) {
-    RBNode<Key, Val> *l_son = node->left;
+  void rightRotate(Node *node) {
+    Node *l_son = node->left;
     node->left = l_son->right;
     if (l_son->right) {
       l_son->right->parent = node;
@@ -198,13 +156,13 @@ private:
   }
 
   // 插入修复
-  void insertFixup(RBNode<Key, Val> *target) {
+  void insertFixup(Node *target) {
     while (target->parent && target->parent->color == Color::RED) {
       // 如果新节点的父节点是红色，就需要进行一些调整来修复树的性质，因为这违反了性质:
       // 红色节点的子节点必须是黑色的
       if (target->parent == target->parent->parent->left) {
         // 父节点是爷爷节点的左孩子
-        RBNode<Key, Val> *uncle = target->parent->parent->right;
+        Node *uncle = target->parent->parent->right;
         if (uncle && uncle->color == Color::RED) {
           // 叔叔节点为红色, 更改叔叔和父亲颜色即可
           target->parent->color = Color::BLACK;
@@ -227,7 +185,7 @@ private:
         }
       } else {
         // 父节点是爷爷节点的右孩子
-        RBNode<Key, Val> *uncle = target->parent->parent->left;
+        Node *uncle = target->parent->parent->left;
         if (uncle && uncle->color == Color::RED) {
           // 叔叔节点为红色, 更改叔叔和父亲颜色即可
           target->parent->color = Color::BLACK;
@@ -257,10 +215,10 @@ private:
   }
 
   // 插入节点
-  void insertNode(const Key &key, const Val &val) {
-    RBNode<Key, Val> *newNode = new RBNode<Key, Val>(key, Color::RED);
-    RBNode<Key, Val> *parent = nullptr;
-    RBNode<Key, Val> *cmpNode = root;
+  void insertNode(const Key &key) {
+    Node *newNode = new Node(key, Color::RED);
+    Node *parent = nullptr;
+    Node *cmpNode = root;
 
     while (cmpNode) {
       parent = cmpNode;
@@ -290,7 +248,7 @@ private:
   }
 
   // 中序遍历
-  void inorderTraversal(RBNode<Key, Val> *node) const {
+  void inorderTraversal(Node *node) const {
     if (node) {
       inorderTraversal(node->left);
       std::cout << node->key << " ";
@@ -298,7 +256,7 @@ private:
     }
   }
   // 辅助函数，用新节点替换旧节点
-  void replaceNode(RBNode<Key, Val> *targetNode, RBNode<Key, Val> *newNode) {
+  void replaceNode(Node *targetNode, Node *newNode) {
     if (!targetNode->parent) {
       // 如果删除了根节点, 用删除节点的子树补上
       root = newNode;
@@ -313,21 +271,21 @@ private:
   }
 
   // 寻找以某个节点为根节点的子树中的最小节点
-  RBNode<Key, Val> *findMinimumNode(RBNode<Key, Val> *node) {
+  Node *findMinimumNode(Node *node) {
     while (node->left) {
       node = node->left;
     }
     return node;
   }
 
-  void removeFixup(RBNode<Key, Val> *node) {
+  void removeFixup(Node *node) {
     if (node == Nil && node->parent == nullptr) {
       return;
     }
     while (node != root) {
       if (node == node->parent->left) {
         // 是其父节点的左子节点
-        RBNode<Key, Val> *sibling = node->parent->right;
+        Node *sibling = node->parent->right;
         if (getColor(sibling) == Color::RED) {
           // 如果兄弟节点是红色的，将其颜色设置为黑色
           setColor(sibling, Color::BLACK);
@@ -369,7 +327,7 @@ private:
           node = root;
         }
       } else {
-        RBNode<Key, Val> *sibling = node->parent->left;
+        Node *sibling = node->parent->left;
         if (getColor(sibling) == Color::RED) {
           setColor(sibling, Color::BLACK);
           setColor(node->parent, Color::RED);
@@ -404,14 +362,14 @@ private:
   }
 
   // Utility functions for getting and setting color of a node
-  Color getColor(RBNode<Key, Val> *node) {
+  Color getColor(Node *node) {
     if (node == nullptr) {
       return Color::BLACK;
     }
     return node->color;
   }
 
-  void setColor(RBNode<Key, Val> *node, Color color) {
+  void setColor(Node *node, Color color) {
     if (node == nullptr) {
       return;
     }
@@ -432,10 +390,10 @@ private:
   }
 
   // 删除节点
-  void deleteNode(RBNode<Key, Val> *nodeToDelete) {
-    RBNode<Key, Val> *nodeToReplace = nodeToDelete;
-    RBNode<Key, Val> *childOfReplaceNode = nullptr;
-    RBNode<Key, Val> *parentOfReplaceNode;
+  void deleteNode(Node *nodeToDelete) {
+    Node *nodeToReplace = nodeToDelete;
+    Node *childOfReplaceNode = nullptr;
+    Node *parentOfReplaceNode;
     Color originalColor = nodeToReplace->color;
 
     if (!nodeToDelete->left) {
@@ -550,25 +508,22 @@ private:
 
 public:
   // 构造函数
-  RedBlackTree() : root(nullptr), size(0), Nil(new RBNode<Key, Val>()) {
+  RedBlackTree() : root(nullptr), size(0), Nil(new Node()) {
     Nil->color = Color::BLACK;
   }
 
   // 构造函数
-  RedBlackTree(RBNode<Key, Val> *_root, int _size)
-      : root(_root), size(_size), Nil(new RBNode<Key, Val>()) {
+  RedBlackTree(Node *_root, int _size)
+      : root(_root), size(_size), Nil(new Node()) {
     Nil->color = Color::BLACK;
   }
 
   // 插入元素
-  void insert(const Key &key) { insertNode(key, Val{}); }
-
-  // 插入元素
-  void insertKV(const Key &key, const Val &val) { insertNode(key, val); }
+  void insert(const Key &key) { insertNode(key); }
 
   // 删除元素
   void remove(const Key &key) {
-    RBNode<Key, Val> *nodeToBeRemoved = getNode(key);
+    Node *nodeToBeRemoved = getNode(key);
     if (nodeToBeRemoved != nullptr) {
       deleteNode(nodeToBeRemoved);
       size--;
@@ -578,7 +533,7 @@ public:
   int blackHeight() {
     // 不包括空节点的黑色节点的高度
     int height = 0;
-    RBNode<Key, Val> *node = root;
+    Node *node = root;
     while (node != nullptr) {
       if (node->color == Color::BLACK) {
         height++;
@@ -634,7 +589,7 @@ public:
 
 private:
   // 递归释放节点内存
-  void deleteTree(RBNode<Key, Val> *node) {
+  void deleteTree(Node *node) {
     if (node) {
       deleteTree(node->left);
       deleteTree(node->right);
@@ -645,7 +600,7 @@ private:
 
 int main() {
   // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  RedBlackTree<int> tree;
 
   // 初始化随机数引擎，使用随机设备来获取种子
   std::random_device rd;

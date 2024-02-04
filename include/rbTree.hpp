@@ -142,7 +142,7 @@ private:
 
   // 插入节点
   void insertNode(const Key &key, const Val &val) {
-    RBNode<Key, Val> *newNode = new RBNode<Key, Val>(key, Color::RED);
+    RBNode<Key, Val> *newNode = new RBNode<Key, Val>(key, val, Color::RED);
     RBNode<Key, Val> *parent = nullptr;
     RBNode<Key, Val> *cmpNode = root;
 
