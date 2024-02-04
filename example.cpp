@@ -75,8 +75,8 @@ int list_test() {
 }
 
 int rbTree_test() {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   // 插入元素
   tree.insert(42);

@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 template <typename Key> class Set {
-  RedBlackTree<Key, Key> rbTree;
+  rbTree<Key, Key> rbTree;
 
 public:
   Set() {}  // 构造函数

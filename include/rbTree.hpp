@@ -10,7 +10,7 @@
 template <typename Key, typename Val> class Map; // 前向声明Map类
 template <typename Key> class Set;               // 前向声明Map类
 
-template <typename Key, typename Val> class RedBlackTree {
+template <typename Key, typename Val> class rbTree {
   friend class Map<Key, Val>; // 声明友元类
   friend class Set<Key>;      // 声明友元类
 
@@ -36,18 +36,16 @@ private:
   }
 
   // 左旋
-  void leftRotate(RBNode<Key, Val> *node) {
+  void lRotate(RBNode<Key, Val> *node) {
     RBNode<Key, Val> *r_son = node->right;
 
-    // 将右孩子的左子树交付给node作为右子树
+    // 右孩子的左子树现在是目标节点的右子树
     node->right = r_son->left;
-
-    // 为右孩子的左子树安排新的父亲为root
     if (r_son->left) {
       r_son->left->parent = node;
     }
 
-    // 将右孩子作为新的node, 分配原node的父节点并协调其关系
+    // 右孩子重新连接node的父亲
     r_son->parent = node->parent;
     if (!node->parent) {
       root = r_son;
@@ -63,7 +61,7 @@ private:
   }
 
   // 右旋
-  void rightRotate(RBNode<Key, Val> *node) {
+  void rRotate(RBNode<Key, Val> *node) {
     RBNode<Key, Val> *l_son = node->left;
     node->left = l_son->right;
     if (l_son->right) {
@@ -82,7 +80,7 @@ private:
   }
 
   // 插入修复
-  void insertFixup(RBNode<Key, Val> *target) {
+  void fixAfterInsert(RBNode<Key, Val> *target) {
     while (target->parent && target->parent->color == Color::RED) {
       // 如果新节点的父节点是红色，就需要进行一些调整来修复树的性质，因为这违反了性质:
       // 红色节点的子节点必须是黑色的
@@ -101,13 +99,13 @@ private:
           if (target == target->parent->right) {
             // 新节点是其父节点的右孩子, 将操作的目标节点变为其父亲, 并左旋
             target = target->parent;
-            leftRotate(target);
+            lRotate(target);
           }
           // 更改操作节点的父节点为黑色, 爷爷节点为红色
           target->parent->color = Color::BLACK;
           target->parent->parent->color = Color::RED;
           // 右旋爷爷节点
-          rightRotate(target->parent->parent);
+          rRotate(target->parent->parent);
         }
       } else {
         // 父节点是爷爷节点的右孩子
@@ -123,13 +121,13 @@ private:
           if (target == target->parent->left) {
             // 新节点是其父节点的左孩子, 将操作的目标节点变为其父亲, 并右旋
             target = target->parent;
-            rightRotate(target);
+            rRotate(target);
           }
           // 更改底部节点为黑色, 爷爷节点为红色
           target->parent->color = Color::BLACK;
           target->parent->parent->color = Color::RED;
           // 左旋爷爷节点
-          leftRotate(target->parent->parent);
+          lRotate(target->parent->parent);
         }
       }
     }
@@ -142,7 +140,7 @@ private:
 
   // 插入节点
   void insertNode(const Key &key, const Val &val) {
-    RBNode<Key, Val> *newNode = new RBNode<Key, Val>(key, Color::RED);
+    RBNode<Key, Val> *newNode = new RBNode<Key, Val>(key, val, Color::RED);
     RBNode<Key, Val> *parent = nullptr;
     RBNode<Key, Val> *cmpNode = root;
 
@@ -170,7 +168,7 @@ private:
       parent->right = newNode;
     }
 
-    insertFixup(newNode);
+    fixAfterInsert(newNode);
   }
 
   // 中序遍历
@@ -196,15 +194,15 @@ private:
     }
   }
 
-  // 寻找以某个节点为根节点的子树中的最小节点
-  RBNode<Key, Val> *findMinimumNode(RBNode<Key, Val> *node) {
+  // 寻找后继
+  RBNode<Key, Val> *findSuccessor(RBNode<Key, Val> *node) {
     while (node->left) {
       node = node->left;
     }
     return node;
   }
 
-  void removeFixup(RBNode<Key, Val> *node) {
+  void fixAfterDelete(RBNode<Key, Val> *node) {
     if (node == Nil && node->parent == nullptr) {
       return;
     }
@@ -217,7 +215,7 @@ private:
           setColor(sibling, Color::BLACK);
           // 将父节点颜色设置为红色
           setColor(node->parent, Color::RED);
-          leftRotate(node->parent);
+          lRotate(node->parent);
           // 旋转后兄弟节点的颜色也是黑色了
           sibling = node->parent->right;
         }
@@ -241,7 +239,7 @@ private:
           if (getColor(sibling->right) == Color::BLACK) {
             setColor(sibling->left, Color::BLACK);
             setColor(sibling, Color::RED);
-            rightRotate(sibling);
+            rRotate(sibling);
             sibling = node->parent->right;
           }
           //   将兄弟节点的颜色设置为当前节点的父节点的颜色，将当前节点的父节点设置为黑色，将兄弟节点的右子节点设置为黑色
@@ -249,7 +247,7 @@ private:
           setColor(node->parent, Color::BLACK);
           setColor(sibling->right, Color::BLACK);
           //   当前节点的父节点进行左旋转, 左旋后各个路径上高度相同
-          leftRotate(node->parent);
+          lRotate(node->parent);
           node = root;
         }
       } else {
@@ -257,7 +255,7 @@ private:
         if (getColor(sibling) == Color::RED) {
           setColor(sibling, Color::BLACK);
           setColor(node->parent, Color::RED);
-          rightRotate(node->parent);
+          rRotate(node->parent);
           sibling = node->parent->left;
         }
 
@@ -273,13 +271,13 @@ private:
           if (getColor(sibling->left) == Color::BLACK) {
             setColor(sibling->right, Color::BLACK);
             setColor(sibling, Color::RED);
-            leftRotate(sibling);
+            lRotate(sibling);
             sibling = node->parent->left;
           }
           setColor(sibling, getColor(node->parent));
           setColor(node->parent, Color::BLACK);
           setColor(sibling->left, Color::BLACK);
-          rightRotate(node->parent);
+          rRotate(node->parent);
           node = root;
         }
       }
@@ -339,7 +337,7 @@ private:
     } else {
       // 2个子树都存在
       // 用要删除节点在中序遍历中的后继来替换当前要删除的元素
-      nodeToReplace = findMinimumNode(nodeToDelete->right);
+      nodeToReplace = findSuccessor(nodeToDelete->right);
       // 交换的节点虽然不需要删除, 但删除的颜色却等效于交换的节点
       originalColor = nodeToReplace->color;
       if (nodeToReplace != nodeToDelete->right) {
@@ -412,7 +410,7 @@ private:
     if (originalColor == Color::BLACK) {
       // 删除的是黑色节点才需要修复
       if (childOfReplaceNode != nullptr) {
-        removeFixup(childOfReplaceNode);
+        fixAfterDelete(childOfReplaceNode);
       } else {
         // 被替换的是叶子节点, 所以childOfReplaceNode为空, 无法从其开始修复,
         // 需要使用哨兵节点替换
@@ -424,7 +422,7 @@ private:
             parentOfReplaceNode->right = Nil;
           }
         }
-        removeFixup(Nil);
+        fixAfterDelete(Nil);
         removeNil();
       }
     }
@@ -434,12 +432,12 @@ private:
 
 public:
   // 构造函数
-  RedBlackTree() : root(nullptr), size(0), Nil(new RBNode<Key, Val>()) {
+  rbTree() : root(nullptr), size(0), Nil(new RBNode<Key, Val>()) {
     Nil->color = Color::BLACK;
   }
 
   // 构造函数
-  RedBlackTree(RBNode<Key, Val> *_root, int _size)
+  rbTree(RBNode<Key, Val> *_root, int _size)
       : root(_root), size(_size), Nil(new RBNode<Key, Val>()) {
     Nil->color = Color::BLACK;
   }
@@ -511,7 +509,7 @@ public:
   void Print() { printTreeHelper(root, " "); }
 
   // 析构函数
-  ~RedBlackTree() {
+  ~rbTree() {
     // 释放节点内存
     deleteTree(root);
   }

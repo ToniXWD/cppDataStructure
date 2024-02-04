@@ -29,4 +29,8 @@ TEST(MapTest, BasicTest) {
 
     ASSERT_EQ(myMap.size(), collect.size());
   }
+  for (auto [k, v] : collect) {
+    // 二者key对应的value一定相同
+    ASSERT_EQ(myMap[k], v);
+  }
 }

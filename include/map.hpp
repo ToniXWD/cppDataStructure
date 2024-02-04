@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 template <typename Key, typename Val> class Map {
-  RedBlackTree<Key, Val> rbTree;
+  rbTree<Key, Val> rbTree;
 
 public:
   Map() {}  // 构造函数

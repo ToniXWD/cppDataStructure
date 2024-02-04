@@ -9,8 +9,8 @@
 
 // Demonstrate some basic assertions.
 TEST(RbTreeTest, InsertTEST) {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   EXPECT_TRUE(tree.empty());
 
@@ -40,8 +40,8 @@ TEST(RbTreeTest, InsertTEST) {
 }
 
 TEST(RbTreeTest, RemoveTest1) {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   EXPECT_TRUE(tree.empty());
 
@@ -108,8 +108,8 @@ TEST(RbTreeTest, RemoveTest1) {
 }
 
 TEST(RbTreeTest, RemoveTest2) {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   EXPECT_TRUE(tree.empty());
 
@@ -140,8 +140,8 @@ TEST(RbTreeTest, RemoveTest2) {
 }
 
 TEST(RbTreeTest, RemoveRoot) {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   EXPECT_TRUE(tree.empty());
 
@@ -184,8 +184,8 @@ TEST(RbTreeTest, RemoveRoot) {
 }
 
 TEST(RbTreeTest, DoubleBlackTest) {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   EXPECT_TRUE(tree.empty());
 
@@ -282,8 +282,8 @@ TEST(RbTreeTest, RemoveWithSiblingHasTwoBlackChildren) {
   n_23_right_of_20_b->left = n_21_left_of_23_b;
   n_23_right_of_20_b->right = n_28_right_of_23_b;
 
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree(root6, 11);
+  // 创建 rbTree 对象
+  rbTree<int, int> tree(root6, 11);
 
   EXPECT_TRUE(tree.len() == tree.getSizeByTranverse());
   EXPECT_TRUE(tree.isBlackLenLegal());
@@ -398,8 +398,8 @@ TEST(RbTreeTest, RemoveWithSiblingHasTwoBlackChildren) {
 }
 
 TEST(RbTreeTest, RandomOperation) {
-  // 创建 RedBlackTree 对象
-  RedBlackTree<int, int> tree;
+  // 创建 rbTree 对象
+  rbTree<int, int> tree;
 
   // 初始化随机数引擎，使用随机设备来获取种子
   std::random_device rd;
