@@ -506,54 +506,60 @@ private:
 };
 
 int main() {
-  RedBlackTree<int> tree;
+  RedBlackTree<int> tree; // 创建一个红黑树的实例，用于存储整数类型的数据
 
-  std::random_device rd;
+  std::random_device rd; // 随机数设备，用于生成随机种子
 
-  std::mt19937 gen(rd()); // 使用 Mersenne Twister 生成器
+  std::mt19937 gen(rd()); // 使用随机种子初始化 Mersenne Twister 随机数生成器
 
-  std::uniform_int_distribution<> dis(0, 2000000);
+  std::uniform_int_distribution<> dis(0, 2000000); // 定义一个分布，用于生成 0 到 200万之间的均匀分布的随机整数
 
-  std::unordered_set<int> collect;
+  std::unordered_set<int> collect; // 创建一个哈希集合，用于跟踪已经插入到红黑树中的元素
 
   // 先插入一部分元素
   for (int i = 0; i < 1000; i++) {
-    int random_number = dis(gen);
-    tree.insert(random_number);
-    collect.insert(random_number);
+    int random_number = dis(gen); // 生成一个随机整数
+    tree.insert(random_number); // 将这个随机整数插入到红黑树中
+    collect.insert(random_number); // 同时将这个随机整数添加到集合中
   }
 
-  int first_resize = collect.size() / 2;
+  int first_resize = collect.size() / 2; // 计算集合当前大小的一半
 
   // 再删除一半的元素
   while (collect.size() > first_resize) {
-    int del_target = *(collect.begin());
-    collect.erase(collect.begin());
+    int del_target = *(collect.begin()); // 获取集合中的一个元素作为待删除目标
+    collect.erase(collect.begin()); // 从集合中删除这个元素
 
-    tree.remove(del_target);
+    tree.remove(del_target); // 从红黑树中删除这个元素
 
+    // 检查红黑树的大小是否与集合中剩余元素的数量一致
     if (tree.getSize() != collect.size()) {
-      std::cout << "error" << '\n';
-      return -1;
+      std::cout << "error" << '\n'; // 如果不一致，输出错误信息
+      return -1; // 并终止程序
     }
   }
 
   // 再插入一部分元素
   for (int i = 0; i < 1000; i++) {
-    int random_number = dis(gen);
-    tree.insert(random_number);
-    collect.insert(random_number);
+    int random_number = dis(gen); // 再次生成一个随机整数
+    tree.insert(random_number); // 将这个随机整数插入到红黑树中
+    collect.insert(random_number); // 同时将这个随机整数添加到集合中
   }
 
   // 再删除所有元素
-  while (!collect.empty()) {
-    int del_target = *(collect.begin());
-    collect.erase(collect.begin());
+  while (!collect.empty()) { // 当集合不为空时，继续删除操作
+    int del_target = *(collect.begin()); // 获取集合中的一个元素作为待删除目标
+    collect.erase(collect.begin()); // 从集合中删除这个元素
 
-    tree.remove(del_target);
+    tree.remove(del_target); // 从红黑树中删除这个元素
+
+    // 再次检查红黑树的大小是否与集合中剩余元素的数量一致
     if (tree.getSize() != collect.size()) {
-      std::cout << "error" << '\n';
-      return -1;
+      std::cout << "error" << '\n'; // 如果不一致，输出错误信息
+      return -1; // 并终止程序
     }
   }
+
+  // 如果一切正常，主函数返回0表示程序正常终止
+  return 0;
 }
