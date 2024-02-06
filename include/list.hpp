@@ -78,6 +78,55 @@ public:
     }
   }
 
+  Node<T> *getNode(const T &val) {
+    Node<T> *node = head;
+    while (node != nullptr && node->val != val) {
+      node = node->next;
+    }
+
+    return node;
+  }
+
+  T *find(const T &val) {
+    Node<T> *node = getNode(val);
+    if (node == nullptr) {
+      return nullptr;
+    }
+    return &node->val;
+  }
+
+  void remove(const T &val) {
+    Node<T> *node = head;
+    while (node != nullptr && node->val != val) {
+      node = node->next;
+    }
+
+    if (node == nullptr) {
+      // 没有找到
+      return;
+    }
+    if (node != head && node != tail) {
+      // 既不是头结点也不是尾结点
+      node->prev->next = node->next;
+      node->next->prev = node->prev;
+    } else if (node == head && node == tail) {
+      // 既是头结点也是尾结点
+      head = nullptr;
+      node = nullptr;
+    } else if (node == head) {
+      // 是头结点
+      head = node->next;
+      head->prev = nullptr;
+    } else {
+      // 是尾结点
+      tail = node->prev;
+      tail->next = nullptr;
+    }
+
+    delete node;
+    node = nullptr;
+  }
+
   // Removes the first element from the list
   void pop_front() {
     if (head != nullptr) {
