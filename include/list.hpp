@@ -5,10 +5,19 @@
 #include <iostream>
 #include <stdexcept>
 
+template <typename Key, typename Val, typename Hash>
+class HashTable; // 前向声明
+
+template <typename Key, typename Val> class Hash_Iterator;
+
 template <typename T> class ListIterator;
 
 // Templated doubly linked list class
 template <typename T> class List {
+  template <typename Key, typename Val, typename Hash> friend class HashTable;
+
+  template <typename Key, typename Val> friend class Hash_Iterator;
+
 private:
   Node<T> *head; // Pointer to the first node of the list
   Node<T> *tail; // Pointer to the last node of the list
@@ -155,7 +164,7 @@ public:
     } else if (node == head && node == tail) {
       // 既是头结点也是尾结点
       head = nullptr;
-      node = nullptr;
+      tail = nullptr;
     } else if (node == head) {
       // 是头结点
       head = node->next;
@@ -218,6 +227,8 @@ public:
   }
 
   T &operator*() { return node->val; }
+
+  T *operator->() { return &node->val; }
 
   bool operator==(const ListIterator &other) const {
     return node == other.node;

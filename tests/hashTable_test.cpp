@@ -1,15 +1,16 @@
 #include "../include/hashTable.hpp"
 #include <cstddef>
 #include <gtest/gtest.h>
+#include <iostream>
 
 // 测试构造函数
-TEST(HashTableTest, Construct) {
+TEST(HashTableTest, ConstructTest) {
   HashTable<int, int> hashTable(5);
   EXPECT_EQ(0, hashTable.size());
 }
 
 // 测试插入功能
-TEST(HashTableTest, Insert) {
+TEST(HashTableTest, InsertTEst) {
   HashTable<int, int> hashTable;
   hashTable.insert(1);
   hashTable.insert(2);
@@ -22,7 +23,7 @@ TEST(HashTableTest, Insert) {
 }
 
 // 测试查找功能
-TEST(HashTableTest, Find) {
+TEST(HashTableTest, FindTest) {
   HashTable<int, int> hashTable;
   hashTable.insert(10);
   hashTable.insert(20);
@@ -31,7 +32,7 @@ TEST(HashTableTest, Find) {
 }
 
 // 测试删除功能
-TEST(HashTableTest, Erase) {
+TEST(HashTableTest, EraseTest) {
   HashTable<int, int> hashTable;
   hashTable.insert(10);
   hashTable.insert(20);
@@ -42,7 +43,7 @@ TEST(HashTableTest, Erase) {
 }
 
 // 测试重哈希功能
-TEST(HashTableTest, Rehash) {
+TEST(HashTableTest, RehashTest) {
   HashTable<int, int> hashTable(2);
 
   for (size_t i = 0; i < 20; i++) {
@@ -56,4 +57,18 @@ TEST(HashTableTest, Rehash) {
 
   hashTable.erase(5);
   EXPECT_FALSE(hashTable.find(5));
+}
+
+// 测试迭代器功能
+TEST(HashTableTest, IteratorTest) {
+  HashTable<int, int> hashTable(2);
+
+  for (size_t i = 0; i < 20; i++) {
+    hashTable.insert(i + 1);
+    // hashTable.print();
+  }
+
+  for (auto &kv : hashTable) {
+    std::cout << "key: " << kv.first << ", val: " << kv.second << '\n';
+  }
 }

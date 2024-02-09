@@ -20,7 +20,12 @@ public:
   }
 
   // Destructor
-  ~Vector() { delete[] elems; }
+  ~Vector() {
+    for (size_t i = 0; i < sz; ++i) {
+      elems[i].~T(); // Call the destructor for each element
+    }
+    delete[] elems; // Release the allocated memory
+  }
 
   // Copy constructor
   Vector(const Vector &other) : cap(other.cap), sz(other.sz) {
@@ -35,6 +40,7 @@ public:
       T *newElems = new T[other.cap];
       std::copy(other.elems, other.elems + other.sz, newElems);
 
+      this->clear();
       // Delete the old array
       delete[] elems;
 
@@ -46,13 +52,20 @@ public:
     return *this; // Return a self-reference
   }
 
-  Vector &operator=(const Vector &&other) {
-    if (this != &other) { // Protect against self-assignment
-      this->cap = other.cap;
-      this->sz = other.sz;
-      this->elems = other.elems;
+  Vector &operator=(Vector &&other) {
+    if (this != &other) {
+      this->clear();
+      delete[] elems; // Release the current array
+
+      elems = other.elems; // Steal the data
+      sz = other.sz;
+      cap = other.cap;
+
+      other.elems = nullptr; // Reset the other vector
+      other.sz = 0;
+      other.cap = 0;
     }
-    return *this; // Return a self-reference
+    return *this;
   }
 
   // Add an element to the end of the array
@@ -129,7 +142,12 @@ public:
   }
 
   // Clear the array
-  void clear() { sz = 0; }
+  void clear() {
+    for (size_t i = 0; i < sz; ++i) {
+      elems[i].~T(); // Call the destructor for each element
+    }
+    sz = 0;
+  }
 
   // Begin iterator
   T *begin() { return elems; }
