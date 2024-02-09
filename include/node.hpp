@@ -1,19 +1,53 @@
 #pragma once
 
 #include <exception>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
 
-template <typename T> struct Node {
+template <typename T> class Node {
 public:
   T val;
   Node *next;
   Node *prev;
   Node(const T &value, Node *nextNode = nullptr, Node *prevNode = nullptr)
       : val(value), next(nextNode), prev(prevNode) {}
+  T &operator*() { return val; }
+  bool &operator<(const Node<T> &other) { return val < other.val; }
 };
+
+template <typename Key, typename Val> class KVNode {
+public:
+  Key key;
+  Val val;
+
+  // 从Key构造节点，Value使用默认构造
+  explicit KVNode(const Key &key) : key(key), val() {}
+
+  // 从Key和Value构造节点
+  KVNode(const Key &key, const Val &value) : key(key), val(value) {}
+
+  // 比较算符重载，只按照key进行比较
+  bool operator==(const KVNode &other) const { return key == other.key; }
+
+  bool operator!=(const KVNode &other) const { return key != other.key; }
+
+  bool operator<(const KVNode &other) const { return key < other.key; }
+
+  bool operator>(const KVNode &other) const { return key > other.key; }
+
+  bool operator==(const Key &key_) const { return key == key_; }
+
+  void print() const { std::cout << "key: " << key << " value: " << val<<" "; }
+};
+
+template <typename Key, typename Val>
+std::ostream &operator<<(std::ostream &os, const KVNode<Key, Val> &kvNode) {
+  os << "key: " << kvNode.key << " value: " << kvNode.val << " ";
+  return os;
+}
 
 enum class Color { RED, BLACK };
 
