@@ -1,4 +1,5 @@
 #include "../include/hashTable.hpp"
+#include <cstddef>
 #include <gtest/gtest.h>
 
 // 测试构造函数
@@ -43,16 +44,16 @@ TEST(HashTableTest, Erase) {
 // 测试重哈希功能
 TEST(HashTableTest, Rehash) {
   HashTable<int, int> hashTable(2);
-  hashTable.insert(1);
-  // hashTable.print();
-  hashTable.insert(2);
-  // hashTable.print();
-  hashTable.insert(3);
-  // hashTable.print();
 
-  EXPECT_TRUE(hashTable.find(1));
-  EXPECT_TRUE(hashTable.find(2));
-  EXPECT_TRUE(hashTable.find(3));
-  // 因为初始大小为2，插入3个元素后，触发重哈希，大小应该变为4
-  EXPECT_GE(4, hashTable.size());
+  for (size_t i = 0; i < 20; i++) {
+    hashTable.insert(i + 1);
+    // hashTable.print();
+  }
+
+  for (size_t i = 0; i < 20; i++) {
+    EXPECT_TRUE(hashTable.find(i + 1));
+  }
+
+  hashTable.erase(5);
+  EXPECT_FALSE(hashTable.find(5));
 }
