@@ -1,20 +1,23 @@
 #pragma once
 
 #include "node.hpp"
+#include "vector.hpp"
 #include <exception>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
 
-template <typename Key, typename Val> class Map; // 前向声明Map类
-template <typename Key> class Set;               // 前向声明Set类
-template <typename Key> class MultiSet;          // 前向声明MultiSet类
+template <typename Key, typename Val> class Map;  // 前向声明Map类
+template <typename Key> class Set;                // 前向声明Set类
+template <typename Key> class MultiSet;           // 前向声明MultiSet类
+template <typename K, typename V> class MultiMap; // 前向声明MultiMap类
 
 template <typename Key, typename Val> class rbTree {
-  friend class Map<Key, Val>; // 声明友元类
-  friend class Set<Key>;      // 声明友元类
-  friend class MultiSet<Key>; // 声明友元类
+  friend class Map<Key, Val>;                              // 声明友元类
+  friend class Set<Key>;                                   // 声明友元类
+  friend class MultiSet<Key>;                              // 声明友元类
+  template <typename K, typename V> friend class MultiMap; // 声明友元类
 
 private:
   RBNode<Key, Val> *root;
@@ -430,6 +433,7 @@ private:
     }
 
     delete nodeToDelete;
+    nodeToDelete = nullptr;
   }
 
 public:
@@ -514,6 +518,12 @@ public:
   ~rbTree() {
     // 释放节点内存
     deleteTree(root);
+    delete Nil;
+  }
+
+  void clear() {
+    deleteNode(root);
+    size = 0;
   }
 
 private:

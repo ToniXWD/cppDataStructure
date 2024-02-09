@@ -21,9 +21,6 @@ public:
 
   // Destructor
   ~Vector() {
-    for (size_t i = 0; i < sz; ++i) {
-      elems[i].~T(); // Call the destructor for each element
-    }
     delete[] elems; // Release the allocated memory
   }
 

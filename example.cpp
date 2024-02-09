@@ -1,42 +1,56 @@
-#include "include/multiset.hpp"
+#include "include/multimap.hpp"
 #include <iostream>
-
+#include <string>
 
 int main() {
-  // 创建一个 MultiSet 的实例
-  MultiSet<int> myMultiSet;
+  // 创建一个 MultiMap 实例，键和值都是 std::string 类型
+  MultiMap<std::string, std::string> myMultiMap;
 
-  // 插入元素
-  std::cout << "Inserting elements...\n";
-  myMultiSet.insert(10);
-  myMultiSet.insert(20);
-  myMultiSet.insert(20);
-  myMultiSet.insert(30);
-  myMultiSet.insert(10);
+  // 插入一些键值对
+  myMultiMap.insert("fruit", "apple");
+  myMultiMap.insert("fruit", "banana");
+  myMultiMap.insert("fruit", "apple"); // 允许重复的值
+  myMultiMap.insert("vegetable", "carrot");
+  myMultiMap.insert("vegetable", "broccoli");
 
-  // 显示 MultiSet 的大小
-  std::cout << "Size of the MultiSet: " << myMultiSet.size() << std::endl;
-
-  // 计数特定元素的数量
-  std::cout << "Count of 20: " << myMultiSet.count(20) << std::endl;
-  std::cout << "Count of 10: " << myMultiSet.count(10) << std::endl;
-  std::cout << "Count of 30: " << myMultiSet.count(30) << std::endl;
-
-  // 删除元素
-  std::cout << "Erasing element 20...\n";
-  myMultiSet.erase(20);
-
-  // 显示 MultiSet 的大小
-  std::cout << "Size of the MultiSet after erasing 20: " << myMultiSet.size()
+  // 显示特定键的值的数量
+  std::cout << "Number of fruits: " << myMultiMap.count("fruit") << std::endl;
+  std::cout << "Number of vegetables: " << myMultiMap.count("vegetable")
             << std::endl;
 
-  // 检查 MultiSet 是否为空
-  std::cout << "Is the MultiSet empty? " << (myMultiSet.empty() ? "Yes" : "No")
+  // 查找并显示特定键的所有值
+  auto fruits = myMultiMap.find("fruit");
+  std::cout << "Fruits: ";
+  for (const auto &fruit : fruits) {
+    std::cout << fruit << " ";
+  }
+  std::cout << std::endl;
+
+  // 删除键为 "fruit" 的所有值
+  myMultiMap.erase("fruit");
+  std::cout << "Number of fruits after erase: " << myMultiMap.count("fruit")
             << std::endl;
 
-  // 再次计数特定元素的数量
-  std::cout << "Count of 20 after erasing: " << myMultiSet.count(20)
+  // 检查 MultiMap 是否为空
+  std::cout << "Is the MultiMap empty? " << (myMultiMap.empty() ? "Yes" : "No")
             << std::endl;
+
+  // 清空 MultiMap
+  myMultiMap.clear();
+  std::cout << "Is the MultiMap empty after clear? "
+            << (myMultiMap.empty() ? "Yes" : "No") << std::endl;
+
+  // 清空后再添加
+  myMultiMap.insert("player", "Jordan");
+  myMultiMap.insert("player", "Messi");
+  std::cout << "Number of player: " << myMultiMap.count("player") << std::endl;
+
+  auto players = myMultiMap.find("player");
+  std::cout << "players: ";
+  for (const auto &player : players) {
+    std::cout << player << " ";
+  }
+  std::cout << std::endl;
 
   return 0;
 }
