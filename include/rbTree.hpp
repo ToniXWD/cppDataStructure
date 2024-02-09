@@ -8,11 +8,13 @@
 #include <utility>
 
 template <typename Key, typename Val> class Map; // 前向声明Map类
-template <typename Key> class Set;               // 前向声明Map类
+template <typename Key> class Set;               // 前向声明Set类
+template <typename Key> class MultiSet;          // 前向声明MultiSet类
 
 template <typename Key, typename Val> class rbTree {
   friend class Map<Key, Val>; // 声明友元类
   friend class Set<Key>;      // 声明友元类
+  friend class MultiSet<Key>; // 声明友元类
 
 private:
   RBNode<Key, Val> *root;
