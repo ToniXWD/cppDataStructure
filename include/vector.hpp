@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <stdexcept>
 
@@ -14,6 +15,10 @@ public:
   // Constructor
   Vector() : elems(nullptr), cap(0), sz(0) {}
 
+  Vector(size_t capacity) : elems(nullptr), cap(capacity), sz(0) {
+    elems = new T[capacity];
+  }
+
   // Destructor
   ~Vector() { delete[] elems; }
 
@@ -25,14 +30,29 @@ public:
 
   // Copy assignment operator
   Vector &operator=(const Vector &other) {
-    if (this != &other) {
+    if (this != &other) { // Protect against self-assignment
+      // Allocate new memory and copy the elements
+      T *newElems = new T[other.cap];
+      std::copy(other.elems, other.elems + other.sz, newElems);
+
+      // Delete the old array
       delete[] elems;
+
+      // Assign the new array and update the size and capacity
+      elems = newElems;
       cap = other.cap;
       sz = other.sz;
-      elems = new T[cap];
-      std::copy(other.elems, other.elems + sz, elems);
     }
-    return *this;
+    return *this; // Return a self-reference
+  }
+
+  Vector &operator=(const Vector &&other) {
+    if (this != &other) { // Protect against self-assignment
+      this->cap = other.cap;
+      this->sz = other.sz;
+      this->elems = other.elems;
+    }
+    return *this; // Return a self-reference
   }
 
   // Add an element to the end of the array
@@ -78,6 +98,27 @@ public:
     }
     elems[idx] = val;
     ++sz;
+  }
+
+  bool remove(const T &val) {
+    size_t idx = 0;
+    for (; idx < sz; ++idx) {
+      if (elems[idx] == val) {
+        break;
+      }
+    }
+    if (idx == sz) { // 如果没找到，直接返回
+      return false;
+    }
+    // 如果找到了元素，而且它不是最后一个元素，就移动后面的元素
+    if (idx < sz - 1) {
+      std::move(elems + idx + 1, elems + sz, elems + idx);
+    }
+    // 显式调用析构函数
+    elems[sz - 1].~T();
+    // 更新size
+    sz--;
+    return true;
   }
 
   // Remove the last element from the array
