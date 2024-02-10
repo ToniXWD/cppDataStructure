@@ -17,8 +17,10 @@
 - [x] 数组
   - [x] `Deque`
   - [x] `Vector`
-  - [ ] 栈
-  - [ ] 堆
+  - [x] 栈
+  - [x] 队列
+- [x] 堆
+  - [x] 优先队列
 - [x] 哈希表
   - [x] `unordered_map`
   - [x] `unordered_set`
