@@ -47,4 +47,9 @@ public:
 
     return 0;
   }
+
+  void clear() {
+    sz = 0;
+    rbTree.clear();
+  }
 };

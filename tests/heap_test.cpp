@@ -1,9 +1,22 @@
 #include "../include/heap.hpp"
 #include <gtest/gtest.h>
+#include <iostream>
+
+// 定义测试固件
+class InitHeap : public ::testing::Test {
+protected:
+  Heap<int> minHeap;
+  void SetUp() override {
+    // 设置测试环境的代码
+  }
+
+  void TearDown() override {
+    // 清理测试环境的代码
+  }
+};
 
 // Test case for inserting elements into the heap
-TEST(HeapTest, InsertAndSize) {
-  Heap<int> minHeap;
+TEST_F(InitHeap, InsertAndSize) {
   minHeap.insert(5);
   minHeap.insert(2);
   minHeap.insert(8);
@@ -12,8 +25,7 @@ TEST(HeapTest, InsertAndSize) {
 }
 
 // Test case for removing the root element
-TEST(HeapTest, RemoveRoot) {
-  Heap<int> minHeap;
+TEST_F(InitHeap, RemoveRoot) {
   minHeap.insert(5);
   minHeap.insert(2);
   minHeap.insert(8);
@@ -23,8 +35,7 @@ TEST(HeapTest, RemoveRoot) {
 }
 
 // Test case to check heap property is maintained after insertions
-TEST(HeapTest, HeapPropertyAfterInsertion) {
-  Heap<int> minHeap;
+TEST_F(InitHeap, HeapPropertyAfterInsertion) {
   minHeap.insert(5);
   minHeap.insert(2);
   minHeap.insert(8);
@@ -39,14 +50,12 @@ TEST(HeapTest, HeapPropertyAfterInsertion) {
 }
 
 // Test case for handling removal from an empty heap
-TEST(HeapTest, RemoveFromEmptyHeap) {
-  Heap<int> minHeap;
+TEST_F(InitHeap, RemoveFromEmptyHeap) {
   EXPECT_THROW(minHeap.removeRoot(), std::out_of_range);
 }
 
 // Test case for dynamic resizing of the heap
-TEST(HeapTest, ResizeHeap) {
-  Heap<int> minHeap;
+TEST_F(InitHeap, ResizeHeap) {
   size_t initialCapacity = 32; // Assuming initial capacity is 32
   for (int i = 0; i < initialCapacity + 1; ++i) {
     minHeap.insert(i);
